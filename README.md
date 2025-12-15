@@ -1,4 +1,4 @@
-ドット絵ぽくするやつ
+ドット絵ぽく色変換するやつ
 ```
 "-o", "--output", default="output.png"
 #Output filename
