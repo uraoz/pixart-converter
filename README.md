@@ -35,4 +35,6 @@ example input
 example output
 <img width="1280" height="720" alt="output" src="https://github.com/user-attachments/assets/ac6cc2ea-994d-43e8-b6ba-52194d644f7b" />
 downscaled output
+
 <img width="640" height="360" alt="output" src="https://github.com/user-attachments/assets/527c130f-44d9-428c-827d-23753219977b" />
+<img width="426" height="240" alt="output" src="https://github.com/user-attachments/assets/14eae7cd-c96d-4c95-9198-38f9b97dc582" />
