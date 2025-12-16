@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Art Converter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Pixel Art Converter</h1>
+      <p class="subtitle">ピクセルアート変換ツール</p>
+    </header>
+
+    <div class="main-content">
+      <!-- Preview Area -->
+      <div class="preview-area">
+        <div class="preview-panel">
+          <h3>元画像</h3>
+          <div class="canvas-wrapper">
+            <canvas id="originalCanvas"></canvas>
+            <div class="drop-zone" id="dropZone">
+              <p>画像をドロップ<br>または<br>クリックして選択</p>
+              <input type="file" id="fileInput" accept="image/*" hidden>
+            </div>
+          </div>
+          <p class="image-info" id="originalInfo">-</p>
+        </div>
+
+        <div class="preview-panel">
+          <h3>プレビュー</h3>
+          <div class="canvas-wrapper">
+            <canvas id="previewCanvas"></canvas>
+            <div class="placeholder" id="previewPlaceholder">
+              <p>画像を読み込んでください</p>
+            </div>
+          </div>
+          <p class="image-info" id="previewInfo">-</p>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <!-- Basic Settings -->
+        <div class="control-section">
+          <h4>基本設定</h4>
+          
+          <div class="control-group">
+            <label for="pixelSize">ピクセルサイズ: <span id="pixelSizeValue">8</span></label>
+            <input type="range" id="pixelSize" min="1" max="32" value="8">
+          </div>
+
+          <div class="control-group">
+            <label for="palette">パレット:</label>
+            <select id="palette">
+              <option value="pico8">PICO-8 (16色)</option>
+              <option value="endesga32">ENDESGA 32 (32色)</option>
+              <option value="lost_century">Lost Century (16色)</option>
+              <option value="sunset8">Sunset 8 (8色)</option>
+              <option value="twilight5">Twilight 5 (5色)</option>
+              <option value="hollow">Hollow (4色)</option>
+              <option value="gameboy">Game Boy (4色)</option>
+              <option value="custom">カスタム</option>
+              <option value="none">パレットなし</option>
+            </select>
+          </div>
+
+          <div class="control-group" id="customPaletteGroup" hidden>
+            <label for="customPalette">カラーコード:</label>
+            <textarea id="customPalette" placeholder="#FF0000, #00FF00, #0000FF&#10;または&#10;#FF0000&#10;#00FF00&#10;#0000FF"></textarea>
+            <div class="palette-preview" id="palettePreview"></div>
+            <p class="palette-hint">カンマ、スペース、改行で区切り。#RRGGBBまたはRRGGBB形式</p>
+          </div>
+
+          <div class="control-group checkbox-group">
+            <label>
+              <input type="checkbox" id="useCiede2000">
+              CIEDE2000を使用（高精度・低速）
+            </label>
+          </div>
+
+          <div class="control-group checkbox-group">
+            <label>
+              <input type="checkbox" id="scaleUp">
+              元サイズにスケールアップ
+            </label>
+          </div>
+        </div>
+
+        <!-- Preprocessing -->
+        <div class="control-section">
+          <h4>前処理</h4>
+          
+          <div class="control-group">
+            <label for="preprocess">前処理方法:</label>
+            <select id="preprocess">
+              <option value="none">なし</option>
+              <option value="auto">自動(計算量重め numpy版を推奨)</option>
+              <option value="auto_levels">オートレベル</option>
+              <option value="histogram">ヒストグラム均等化</option>
+              <option value="clahe">CLAHE</option>
+              <option value="match_palette">パレットマッチング(計算量重め numpy版を推奨)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="gamma">ガンマ: <span id="gammaValue">1.0</span></label>
+            <input type="range" id="gamma" min="0.2" max="3.0" step="0.1" value="1.0">
+          </div>
+        </div>
+
+        <!-- Adjustments (Real-time) -->
+        <div class="control-section">
+          <h4 id="adjustmentsSectionTitle">調整（リアルタイム）</h4>
+          
+          <div class="control-group">
+            <label for="brightness">明るさ: <span id="brightnessValue">0</span></label>
+            <input type="range" id="brightness" min="-100" max="200" value="0">
+          </div>
+
+          <div class="control-group">
+            <label for="contrast">コントラスト: <span id="contrastValue">0</span></label>
+            <input type="range" id="contrast" min="-100" max="200" value="0">
+          </div>
+
+          <div class="control-group">
+            <label for="saturation">彩度: <span id="saturationValue">0</span></label>
+            <input type="range" id="saturation" min="-100" max="200" value="0">
+          </div>
+
+          <button class="btn btn-secondary" id="resetAdjustments">リセット</button>
+        </div>
+
+        <!-- Actions -->
+        <div class="control-section actions">
+          <button class="btn btn-primary" id="convertBtn" disabled>
+            <span class="btn-text">変換</span>
+            <span class="btn-loading" hidden>処理中...</span>
+          </button>
+          <button class="btn btn-success" id="downloadBtn" disabled>ダウンロード</button>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-section" id="progressSection" hidden>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <p class="progress-text" id="progressText">処理中...</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>Pixel Art Converter - Client-side Image Processing</p>
+    </footer>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
