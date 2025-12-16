@@ -21,9 +21,6 @@
 "--no-palette", action="store_true",
 #Disable palette mapping
 
-"--scale-up", action="store_true",
-#Scale output back to original size
-
 "--ciede2000", action="store_true",
 #Use CIEDE2000 color distance
 
