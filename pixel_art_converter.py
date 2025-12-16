@@ -555,10 +555,6 @@ def downscale_image(image: Image.Image, pixel_size: int) -> Image.Image:
     return image.resize((new_width, new_height), Image.Resampling.NEAREST)
 
 
-def upscale_image(image: Image.Image, target_size: tuple) -> Image.Image:
-    """Upscale image back to target size using nearest neighbor."""
-    return image.resize(target_size, Image.Resampling.NEAREST)
-
 
 # ============================================================================
 # Main Conversion Pipeline
@@ -573,7 +569,6 @@ def convert_to_pixel_art(
     saturation: float = 0,
     palette_name: str = "default",
     use_palette: bool = True,
-    scale_up: bool = False,
     use_ciede2000: bool = False,
 ) -> None:
     """
@@ -588,7 +583,6 @@ def convert_to_pixel_art(
         saturation: Saturation adjustment (-100 to 200)
         palette_name: Name of palette to use
         use_palette: Whether to apply palette mapping
-        scale_up: Whether to scale output back to original size
         use_ciede2000: Use CIEDE2000 instead of RGB Euclidean distance
     """
     # Load image
@@ -644,11 +638,6 @@ def convert_to_pixel_art(
     # Convert back to PIL Image
     result = Image.fromarray(img_array)
     
-    # Optionally scale back up
-    if scale_up:
-        result = upscale_image(result, original_size)
-        print(f"Scaled up to: {result.width}x{result.height}")
-    
     # Save
     result.save(output_path)
     print(f"Saved: {output_path}")
@@ -690,8 +679,6 @@ def main():
                         help="Palette name (default: default)")
     parser.add_argument("--no-palette", action="store_true",
                         help="Disable palette mapping")
-    parser.add_argument("--scale-up", action="store_true",
-                        help="Scale output back to original size")
     parser.add_argument("--ciede2000", action="store_true",
                         help="Use CIEDE2000 color distance (slower but perceptually accurate)")
     parser.add_argument("--list-palettes", action="store_true",
@@ -722,7 +709,6 @@ def main():
         saturation=args.saturation,
         palette_name=args.palette,
         use_palette=not args.no_palette,
-        scale_up=args.scale_up,
         use_ciede2000=args.ciede2000,
     )
     
